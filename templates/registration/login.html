@@ -1,0 +1,17 @@
+{% extends "bets/base.html" %}
+
+{% block content %}
+<div class="card">
+  <h2>Log in</h2>
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="next" value="{{ next|default:'/' }}">
+    <button>Log in</button>
+  </form>
+
+  <p style="margin-top:.5rem;">
+    <a href="{% url 'password_reset' %}">Forgot password?</a>
+  </p>
+</div>
+{% endblock %}

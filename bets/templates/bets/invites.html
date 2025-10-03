@@ -1,0 +1,58 @@
+{% extends 'bets/base.html' %}
+
+{% block content %}
+<div class="card">
+  <h2>Invites</h2>
+
+  <h3>Friend requests</h3>
+  <ul class="list">
+    {% for r in friend_incoming %}
+      <li>
+        <strong>{{ r.from_user.username }}</strong> wants to be friends.
+        <form method="post" action="{% url 'bets:friend_accept' r.pk %}" style="display:inline;">
+          {% csrf_token %}<button>Accept</button>
+        </form>
+        <form method="post" action="{% url 'bets:friend_decline' r.pk %}" style="display:inline;margin-left:.5rem;">
+          {% csrf_token %}<button>Decline</button>
+        </form>
+      </li>
+    {% empty %}
+      <li>No friend requests.</li>
+    {% endfor %}
+  </ul>
+
+  <h3 style="margin-top:1rem;">Event invites</h3>
+  <ul class="list">
+    {% for r in event_incoming %}
+      <li>
+        <strong>{{ r.from_user.username }}</strong> invited you to <em>{{ r.event.name }}</em>.
+        <form method="post" action="{% url 'bets:event_invite_accept' r.pk %}" style="display:inline;">
+          {% csrf_token %}<button>Accept</button>
+        </form>
+        <form method="post" action="{% url 'bets:event_invite_decline' r.pk %}" style="display:inline;margin-left:.5rem;">
+          {% csrf_token %}<button>Decline</button>
+        </form>
+      </li>
+    {% empty %}
+      <li>No event invites.</li>
+    {% endfor %}
+  </ul>
+
+  <h3 style="margin-top:1rem;">Market invites</h3>
+  <ul class="list">
+    {% for r in market_incoming %}
+      <li>
+        <strong>{{ r.from_user.username }}</strong> shared market <em>{{ r.market.title }}</em> with you.
+        <form method="post" action="{% url 'bets:market_share_accept' r.pk %}" style="display:inline;">
+          {% csrf_token %}<button>Accept</button>
+        </form>
+        <form method="post" action="{% url 'bets:market_share_decline' r.pk %}" style="display:inline;margin-left:.5rem;">
+          {% csrf_token %}<button>Decline</button>
+        </form>
+      </li>
+    {% empty %}
+      <li>No market invites.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

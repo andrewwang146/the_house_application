@@ -1,0 +1,42 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Be The House</title>
+  <link rel="stylesheet" href="{% static 'bets/styles.css' %}">
+</head>
+<body>
+  <header class="container">
+    <h1>The House</h1>
+    <nav>
+      {% if user.is_authenticated %}
+        <span>Hi, {{ user.username }}</span>
+        <a href="{% url 'bets:dashboard' %}">Dashboard</a>
+        <a href="{% url 'bets:friends' %}">Friends</a>
+        <a href="{% url 'bets:event_create' %}">New Event</a>
+        <a href="{% url 'bets:market_create' %}">New Market</a>
+        <a href="{% url 'bets:market_history' %}">History</a>
+        <a href="{% url 'bets:invites' %}">Invites{% if invite_count %} ({{ invite_count }}){% endif %}</a>
+        {% if user.is_superuser %}<a href="{% url 'admin:index' %}">Admin</a>{% endif %}
+        <a href="{% url 'bets:logout' %}">Log out</a>
+      {% else %}
+        <a href="{% url 'login' %}">Log in</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="container">
+    {% for message in messages %}
+      <div class="flash {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global app JS -->
+  <script src="{% static 'bets/app.js' %}"></script>
+  <!-- Page-specific scripts go here, AFTER app.js is loaded -->
+  {% block scripts %}{% endblock %}
+</body>
+</html>
