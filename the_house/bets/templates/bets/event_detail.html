@@ -1,0 +1,38 @@
+{% extends 'bets/base.html' %}
+{% load formatting %}
+{% block content %}
+<div class="card">
+  <h2>{{ event.name }}</h2>
+  <p>{{ event.description }}</p>
+
+  {% if can_invite %}
+    <h3>Invite to event</h3>
+    <form method="post" action="{% url 'bets:event_invite' event.pk %}">
+      {% csrf_token %}
+      {{ invite_form.as_p }}
+      <button>Invite</button>
+    </form>
+  {% endif %}
+
+  <h3 style="margin-top:1rem;">Members</h3>
+  <ul class="list">
+    {% for u in members %}
+      <li>{{ u.username }}</li>
+    {% empty %}
+      <li>Only you so far.</li>
+    {% endfor %}
+  </ul>
+
+  <h3 style="margin-top:1rem;">Markets</h3>
+  <ul class="list">
+    {% for m in markets %}
+      <li>
+        <a href="{% url 'bets:market_detail' m.pk %}">{{ m.title }}</a>
+        ({{ m.status }}) — by {{ m.creator.username }}
+      </li>
+    {% empty %}
+      <li>No markets yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

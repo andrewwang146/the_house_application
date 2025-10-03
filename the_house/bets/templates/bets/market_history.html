@@ -1,0 +1,46 @@
+{% extends 'bets/base.html' %}
+{% load formatting %}
+{% block content %}
+<div class="card">
+  <h2>Completed Markets (Your History)</h2>
+
+  <form method="get" style="margin-bottom:.5rem;">
+    <label>Filter:
+      <select name="filter" onchange="this.form.submit()">
+        <option value="all" {% if filter == 'all' %}selected{% endif %}>All</option>
+        <option value="bet_on" {% if filter == 'bet_on' %}selected{% endif %}>Markets bet on</option>
+        <option value="set_by_me" {% if filter == 'set_by_me' %}selected{% endif %}>Markets set</option>
+        <option value="winning_bets" {% if filter == 'winning_bets' %}selected{% endif %}>Winning bets</option>
+        <option value="winning_sets" {% if filter == 'winning_sets' %}selected{% endif %}>Winning sets</option>
+      </select>
+    </label>
+  </form>
+
+  <ul class="list">
+    {% for m in settled_markets %}
+      <li>
+        <div class="title-line">
+          <a href="{% url 'bets:market_detail' m.pk %}" class="market-title" title="{{ m.title }}">{{ m.title }}</a>
+        </div>
+        {% for oc in m.outcomes.all %}
+          {% if oc.is_winner %}
+            <div class="outcome-line"><span class="badge">OUTCOME: {{ oc.title }}</span></div>
+          {% endif %}
+        {% endfor %}
+
+        {% if m.id in bettor_net %}
+          {% with amount=bettor_net|get_item:m.id %}
+            <div class="outcome-line">
+              <em>Your result:</em> <strong>{{ amount|money }}</strong>
+            </div>
+          {% endwith %}
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>No settled markets yet.</li>
+    {% endfor %}
+  </ul>
+
+  <p style="margin-top:.5rem;"><a href="{% url 'bets:dashboard' %}">← Back to dashboard</a></p>
+</div>
+{% endblock %}

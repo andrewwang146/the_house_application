@@ -1,0 +1,8 @@
+{% extends "bets/base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Logged out</h2>
+  <p>You’ve been logged out.</p>
+  <p><a href="{% url 'login' %}">Log in again</a></p>
+</div>
+{% endblock %}

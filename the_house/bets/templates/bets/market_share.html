@@ -1,0 +1,20 @@
+{% extends 'bets/base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Share market: {{ market.title }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button>Share</button>
+  </form>
+
+  <h3 style="margin-top:1rem;">Shared with</h3>
+  <ul class="list">
+    {% for u in shared_users %}
+      <li>{{ u.username }}</li>
+    {% empty %}
+      <li>No one yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

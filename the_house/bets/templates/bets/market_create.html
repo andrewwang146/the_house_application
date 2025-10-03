@@ -1,0 +1,106 @@
+{% extends 'bets/base.html' %}
+{% block content %}
+<div class="card">
+  <h2>New Market</h2>
+  <form method="post" id="market-form">
+    {% csrf_token %}
+
+    <p>
+      {{ form.title.label_tag }}<br>
+      {{ form.title }}
+    </p>
+
+    <p>
+      {{ form.event.label_tag }}<br>
+      {{ form.event }}
+      <small>If the event has a default house, this market will inherit it unless overridden.</small>
+    </p>
+
+    <p>
+      {{ form.house_margin.label_tag }}<br>
+      {{ form.house_margin }}
+    </p>
+
+    <p>
+      {{ form.closes_at.label_tag }}<br>
+      {{ form.closes_at }}
+    </p>
+
+    <p>
+      <label>{{ form.be_the_house }} Be the house (you)</label><br>
+      <small>If checked, you’ll be the house for this market regardless of event defaults.</small>
+    </p>
+
+    <p>
+      {{ form.house.label_tag }}<br>
+      {{ form.house }}
+      <small>Optional override. Leave blank to inherit the event’s default (if any).</small>
+    </p>
+
+    <!-- NEW: Max bet limit with default + prompt -->
+    <p>
+      <label for="id_max_bet_limit">Max bet limit</label><br>
+      {{ form.max_bet_limit }}
+      <small>Default for you: {{ current_default_max|default:"100.00" }}</small>
+    </p>
+
+    <div id="set-default-prompt" class="hint" hidden>
+      <button type="button" id="make-default-btn">Make this my new default</button>
+    </div>
+    <input type="hidden" name="set_default_max_bet" id="set-default-flag" value="0" />
+
+    <hr>
+    <h3>Outcomes</h3>
+    <p>Each outcome has a slider and a numeric weight (0–100). We normalize the weights and apply the house margin to compute odds.</p>
+
+    <div id="outcomes"></div>
+    <button type="button" id="add-outcome">+ Add outcome</button>
+
+    <h3>Live Odds Preview</h3>
+    <div id="odds-preview"></div>
+
+    <button type="submit">Create Market</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.MARGIN_INPUT_NAME = 'house_margin';
+
+  // Show a prompt if max_bet_limit differs from the current default
+  (function () {
+    const input = document.getElementById('id_max_bet_limit');
+    const promptBox = document.getElementById('set-default-prompt');
+    const flag = document.getElementById('set-default-flag');
+    if (!input || !promptBox || !flag) return;
+
+    // Use data-default from server if you want; here we read from the template var:
+    const defaultVal = parseFloat('{{ current_default_max|default:"100.00" }}');
+
+    const check = () => {
+      const v = parseFloat(input.value || '0');
+      const changed = !Number.isNaN(v) && Math.abs(v - defaultVal) > 1e-9;
+      promptBox.hidden = !changed;
+      if (!changed) flag.value = '0';
+    };
+
+    input.addEventListener('input', check);
+    input.addEventListener('change', check);
+
+    document.getElementById('make-default-btn')?.addEventListener('click', () => {
+      flag.value = '1';
+      promptBox.hidden = true; // hide prompt after choosing
+      alert('This will be saved as your new default when you create the market.');
+    });
+
+    check();
+  })();
+
+  // Keep your outcome builder init
+  setupOutcomeBuilder([
+    { title: 'Yes', weight: 50 },
+    { title: 'No',  weight: 50 },
+  ]);
+</script>
+{% endblock %}
